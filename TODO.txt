@@ -1,0 +1,3 @@
+ - Save Button entfernen => Save on Connect
+ - MQTT-Server zum connecten => subscribe und get messages => write in table
+   (zum testen Server in Python starten und sachen publishen)

@@ -1,19 +1,32 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hydrahomie/DataTable.dart';
 import 'package:intl/intl.dart';
 
-String Sip = '5';
-String Liter = '0.5';
+
+import 'MQTTAppState.dart';
+import 'MQTTManager.dart';
+
+
+TextEditingController Sip = TextEditingController();
+TextEditingController Liter = TextEditingController();
+TextEditingController Hydration = TextEditingController();
 DateFormat dateFormat = DateFormat("yyyy-MM-dd");
 bool ishydrate = true;
 List<DataRow> dataRows = [];
+late MQTTAppState currentAppState;
+late MQTTManager manager;
+Row? sips;
 
 Widget mainWidget(){
-  return mainlayout();
+  Sip.text = "0";
+  Liter.text = "0.0 l";
+  Hydration.text = "Dehydrated";
+  currentAppState = MQTTAppState();
+  Widget main = mainlayout();
+  return main;
 }
 
 Widget mainlayout() {
-
   return Column(
           children:[
             Row(
@@ -27,25 +40,20 @@ Widget mainlayout() {
               ],
             ),
             rows('Sip Counter', Sip),
-            rows('Liter Consumtion', '$Liter l'),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: <Widget>[
-                  HydratedDehydrated("Hydrated",ishydrate),
-                  HydratedDehydrated("Dehydrated",!ishydrate)
-              ],
-            ),
+            rows('Liter Consumtion', Liter),
+            HydratedDehydrated(),
             Row(
               children: [
                 Infotable()
               ],
             ),
             Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
                 child: const Text("Connect"),
-                onPressed:() {},
+                onPressed:() {savedata();},
                 style: ElevatedButton.styleFrom(
                   primary: Colors.lightBlue,
                     fixedSize: const Size(180, 50),
@@ -55,75 +63,61 @@ Widget mainlayout() {
                       fontWeight: FontWeight.bold)
                 ),
                 ),
-                ElevatedButton(
-                  child: const Text("Save"),
-                  onPressed: () {savedata();},
-                  style: ElevatedButton.styleFrom(
-                      primary: Colors.lightGreen,
-                      fixedSize: const Size(180, 50),
-                      padding: const EdgeInsets.all(5),
-                      textStyle: const TextStyle(
-                          fontSize: 30,
-                          fontWeight: FontWeight.bold)
-                  ),
-                ),
               ],
             )
           ]
         );
 }
 
-void savedata() {
-  String date = dateFormat.format(DateTime.now());
-  String name = ishydrate ? 'Hydrated' : 'Dehydrated';
-  dataRows.add(DataRow(
-    cells: <DataCell>[
-      DataCell(Text(date)),
-      DataCell(Text('5')),
-      DataCell(Text('0.5 l')),
-      DataCell(Text(name)),
-    ],
-  ));
-}
-
-
-Widget rows(String titleText, String boxTitle){
+Widget rows(String titleText, TextEditingController controller){
   return Card(
     elevation: 5,
     child: ListTile(
       title: Text(titleText,
       ),
-      trailing: Text(boxTitle)
+      trailing: Container(
+        padding: const EdgeInsets.symmetric(vertical: 4.0),
+        height: 100,
+        width: 100,
+        child: TextField(
+          controller: controller,
+          textAlign: TextAlign.right,
+          readOnly: true,
+          decoration: const InputDecoration(
+            border: InputBorder.none,
+          ),
+        ),
+      )
       ),
   );
 }
 
-Widget HydratedDehydrated(String info,bool hydrated){
-  return Container(
-    margin: const EdgeInsets.all(5),
-    padding: const EdgeInsets.all(5),
-    width: 180,
-    height: 50,
-    decoration: BoxDecoration(
-      color: hydrated ? Colors.lightBlue : Colors.white,
-      shape: BoxShape.rectangle,
-      border: Border.all(width: 3.0),
-      borderRadius: const BorderRadius.all(Radius.circular(10))),
-    child: Center(
-      child:
-        Text(info,
-          textAlign: TextAlign.center,
-          style: const TextStyle(
-              fontSize: 30,
-              color: Colors.black,
-              fontWeight: FontWeight.bold),
-        ),
+Widget HydratedDehydrated() {
+  return Card(
+    elevation: 5,
+    child: ListTile(
+        title: Container(
+          padding: const EdgeInsets.symmetric(vertical: 4.0),
+          height: 50,
+          width: double.infinity,
+          child: TextField(
+            controller: Hydration,
+            textAlign: TextAlign.center,
+            readOnly: true,
+            style: TextStyle(fontSize: 34.0, height: 2.0, color: Colors.black),
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+
+            ),
+          ),
+        )
     ),
   );
 }
 
 Widget Infotable(){
   return DataTable(
+
     horizontalMargin: 10,
     columns: const <DataColumn>[
       DataColumn(
@@ -144,17 +138,22 @@ Widget Infotable(){
           style: TextStyle(fontStyle: FontStyle.italic),
         ),
       ),
-      DataColumn(
-        label: Text(
-          'Hydration',
-          style: TextStyle(fontStyle: FontStyle.italic),
-        ),
-      ),
+      DataColumn(label: Text('Hydration', style: TextStyle(fontStyle: FontStyle.italic),),),
     ],
     rows: dataRows,
   );
 }
 
+void _configureAndConnect() {
+  // ignore: flutter_style_todos
+  // TODO: Use UUID
 
-
+  manager = MQTTManager(
+      host: "broker.mqttdashboard.com",
+      topic: "aisoudfoiasdfzasdufizasodiufzaosd",
+      identifier: "TestApp-546546546",
+      state: currentAppState);
+  manager.initializeMQTTClient();
+  manager.connect();
+}
 
