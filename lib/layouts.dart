@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hydrahomie/DataTable.dart';
 import 'package:intl/intl.dart';
 
 
@@ -53,7 +52,7 @@ Widget mainlayout() {
               children: [
                 ElevatedButton(
                 child: const Text("Connect"),
-                onPressed:() {savedata();},
+                onPressed:() {_configureAndConnect();},
                 style: ElevatedButton.styleFrom(
                   primary: Colors.lightBlue,
                     fixedSize: const Size(180, 50),
