@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hydrahomie/main.dart';
+import 'package:intl/intl.dart';
 import 'layouts.dart';
 
 enum MQTTAppConnectionState { connected, disconnected, connecting }
@@ -13,35 +14,40 @@ class MQTTAppState with ChangeNotifier{
     int sips;
     double liters;
     if(isNumeric(text)) {
+      gotData = true;
       sips = int.parse(text);
       liters = sips / 40;
       if(liters > 2) {
         Hydration.text = "Hydrated";
+      } else {
+        Hydration.text = "Dehydrated";
       }
-      dataRows.add(const DataRow(cells: [
+      DateTime now = DateTime.now();
+      String now_str = DateFormat('yyyy-MM-dd').format(now);
+      dataRows.add(DataRow(cells: [
         DataCell(
-          Text("asdf")
+          Text(now_str)
         ),
         DataCell(
-            Text("asdf")
+            Text(sips.toString())
         ),
         DataCell(
-            Text("asdf")
+            Text(liters.toString())
         ),
         DataCell(
-            Text("asdf")
+            Text(Hydration.text)
         )
       ]));
+      asdf.setState(() {
+
+      });
     }
     else {
       sips = 0;
       liters = 0.0;
     }
-
     Sip.text = sips.toString();
     Liter.text = liters.toString() + " l";
-
-
     _historyText = _historyText + '\n' + _receivedText;
     notifyListeners();
   }

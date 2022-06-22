@@ -15,11 +15,14 @@ List<DataRow> dataRows = [];
 late MQTTAppState currentAppState;
 late MQTTManager manager;
 Row? sips;
+bool gotData = false;
 
 Widget mainWidget(){
-  Sip.text = "0";
-  Liter.text = "0.0 l";
-  Hydration.text = "Dehydrated";
+  if(!gotData) {
+    Sip.text = "0";
+    Liter.text = "0.0 l";
+    Hydration.text = "Dehydrated";
+  }
   currentAppState = MQTTAppState();
   Widget main = mainlayout();
   return main;
@@ -42,11 +45,6 @@ Widget mainlayout() {
             rows('Liter Consumtion', Liter),
             HydratedDehydrated(),
             Row(
-              children: [
-                Infotable()
-              ],
-            ),
-            Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -63,6 +61,21 @@ Widget mainlayout() {
                 ),
                 ),
               ],
+            ),
+            Row(
+              children: [
+                  Container(
+                  width: 392,
+                  height: 337,
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(), // new
+                    scrollDirection: Axis.vertical,
+                    children: [
+                      Infotable()
+                    ],
+                  )
+                )
+              ]
             )
           ]
         );
@@ -139,7 +152,7 @@ Widget Infotable(){
       ),
       DataColumn(label: Text('Hydration', style: TextStyle(fontStyle: FontStyle.italic),),),
     ],
-    rows: dataRows,
+    rows: dataRows.reversed.toList(),
   );
 }
 
