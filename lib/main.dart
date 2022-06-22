@@ -29,6 +29,7 @@ class _WaterIntake extends State<ControllWaterIntake> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true, // set it to false
       appBar: AppBar(
         backgroundColor: Colors.cyan,
         title: const Center(

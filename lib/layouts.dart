@@ -45,6 +45,21 @@ Widget mainlayout() {
             rows('Liter Consumtion', Liter),
             HydratedDehydrated(),
             Row(
+                children: [
+                  Container(
+                      width: 392,
+                      height: 300,
+                      child: ListView(
+                        physics: const AlwaysScrollableScrollPhysics(), // new
+                        scrollDirection: Axis.vertical,
+                        children: [
+                          Infotable()
+                        ],
+                      )
+                  )
+                ]
+            ),
+            Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
@@ -61,22 +76,8 @@ Widget mainlayout() {
                 ),
                 ),
               ],
-            ),
-            Row(
-              children: [
-                  Container(
-                  width: 392,
-                  height: 337,
-                  child: ListView(
-                    physics: const AlwaysScrollableScrollPhysics(), // new
-                    scrollDirection: Axis.vertical,
-                    children: [
-                      Infotable()
-                    ],
-                  )
-                )
-              ]
             )
+
           ]
         );
 }
